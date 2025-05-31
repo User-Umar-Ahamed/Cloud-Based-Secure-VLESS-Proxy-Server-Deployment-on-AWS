@@ -1,141 +1,220 @@
 # Cloud-Based Secure VLESS Proxy Server on AWS with Dynamic DNS
 
-## Overview  
-This project guides you through deploying a secure VLESS proxy server on an AWS EC2 Ubuntu instance, configuring No-IP Dynamic DNS for hostname resolution, and connecting clients securely via TLS.
+# 🛡️ Secure VLESS Proxy Server with AWS EC2 + 3X UI + No-IP + TLS
 
-You will learn how to:
+This project sets up a **secure VLESS proxy server** using open-source tools like **Xray-core**, **3X UI**, **AWS EC2**, **No-IP**, and **Certbot**. It's designed for **personal learning** and **privacy protection**, not commercial use.
 
-- Sign up for AWS and launch an Ubuntu EC2 server  
-- Set up a free dynamic DNS hostname using No-IP  
-- Install and configure the Xray-core VLESS proxy server  
-- Secure the connection with TLS encryption  
-- Connect clients using the No-IP hostname  
+It helps beginners understand:
+
+- How to deploy cloud infrastructure with AWS EC2  
+- How to run a proxy server using the modern **VLESS** protocol  
+- How to use a free domain with **Dynamic DNS (No-IP)**  
+- How to enable TLS encryption using **Let's Encrypt certificates**  
+- How to configure everything easily using **a graphical admin panel (3X UI)**  
+
+Whether you're a student, developer, or privacy-conscious user, this project gives you hands-on experience with real-world networking and security practices.
 
 ---
 
-## Why This Project?
+> **Note:** This project is meant for educational purposes only and should not be used for illegal activity or commercial deployment.
+---
 
-Many users need a reliable, secure proxy server to bypass network restrictions or enhance privacy. AWS provides flexible cloud infrastructure, but its public IP can change if you stop/start the instance. Using No-IP Dynamic DNS solves this by providing a stable hostname.
+## 📌 Table of Contents
 
-VLESS protocol with TLS ensures encrypted, fast, and modern proxy connections. This setup combines the best of cloud scalability, dynamic hostname, and secure proxy protocols.
+- [Project Purpose](#project-purpose)
+- [What You'll Learn](#what-youll-learn)
+- [Tools & Technologies Used](#tools--technologies-used)
+- [Step-by-Step Setup Guide](#step-by-step-setup-guide)
+  - [Step 1: Create AWS EC2 Ubuntu Instance](#step-1-create-aws-ec2-ubuntu-instance)
+  - [Step 2: Install Xray-core and 3X UI](#step-2-install-xray-core-and-3x-ui)
+  - [Step 3: Set Up Dynamic DNS with No-IP](#step-3-set-up-dynamic-dns-with-no-ip)
+  - [Step 4: Install SSL Certificates using Certbot](#step-4-install-ssl-certificates-using-certbot)
+  - [Step 5: Configure 3X UI Panel and Add Inbound](#step-5-configure-3x-ui-panel-and-add-inbound)
+  - [Step 6: Connect from VPN Client](#step-6-connect-from-vpn-client)
+- [Benefits](#benefits)
+- [Limitations](#limitations)
+- [Disclaimer](#disclaimer)
 
-Purpose: To set up a secure VLESS (VMess-less) proxy server using Xray-core with a GUI (3X UI), hosted on AWS EC2 and dynamically linked to a custom domain using No-IP DDNS.
+---
 
-🔧 Step-by-Step Breakdown
-🔹 Step 1: Create AWS EC2 Instance
-🧠 What Happens:
-You sign up for an Amazon Web Services (AWS) account and launch a virtual server (EC2 instance) running Ubuntu Linux.
+## 🎯 Project Purpose
 
-You choose t2.micro, which is free under AWS Free Tier.
+The purpose of this project is to:
+- Deploy a personal proxy server using the **VLESS** protocol (a lightweight, modern version of VMess).
+- Learn how to use **cloud infrastructure**, **dynamic DNS**, **TLS certificates**, and **GUI-based management** (3X UI).
+- Enhance **online privacy and secure communication** through encryption and tunneling.
+- Explore how **Xray-core** powers decentralized, proxy-based internet access.
 
-You open required ports via Security Groups:
+---
 
-22 (SSH) for secure terminal access
+## 📘 What You'll Learn
 
-443 (HTTPS) and 2004 (Custom TCP for panel access)
+- Launching a Ubuntu server on AWS EC2
+- Securing it with SSH, firewall rules, and SSL certificates
+- Installing and configuring **Xray-core** proxy software
+- Managing users and configs through the **3X UI panel**
+- Using **No-IP** to map your changing IP to a static domain
+- Connecting securely using a VLESS VPN client
 
-✅ Outcome:
-You get a remote Ubuntu server with open access to install your services and manage your proxy panel.
+---
 
-🔹 Step 2: Connect to EC2 and Install Xray-core
-🧠 What Happens:
-You SSH into your instance using the .pem key.
+## 🔧 Tools & Technologies Used
 
-You install essential packages and Xray-core using the official script:
+| Tool / Service     | Purpose                                     |
+|--------------------|---------------------------------------------|
+| **AWS EC2**         | Cloud server hosting (Ubuntu 24.04 LTS)     |
+| **Xray-core**       | Core proxy engine supporting VLESS          |
+| **3X UI**           | Graphical management panel for Xray         |
+| **No-IP**           | Dynamic DNS service                         |
+| **Certbot**         | Free SSL certificate tool (Let's Encrypt)   |
+| **Netmod / Nekoray**| Client apps for VLESS proxy connection      |
 
-bash
-Copy
-Edit
-bash <(curl -L https://raw.githubusercontent.com/XTLS/Xray-install/main/install-release.sh)
-This sets up the Xray-core binary and environment on your EC2 server.
+---
 
-✅ Outcome:
-Your server is now capable of handling encrypted VLESS protocol connections for proxy use.
+## 🛠️ Step-by-Step Setup Guide
 
-🔹 Step 3: Set Up No-IP Dynamic DNS
-🧠 What Happens:
-AWS public IPs are not static — they change after restarts.
+---
 
-No-IP gives you a free dynamic hostname (e.g., teanex.zapto.org) that automatically maps to your current public IP.
+### ✅ Step 1: Create AWS EC2 Ubuntu Instance
 
-✅ Outcome:
-You get a stable domain name (like a website address) to connect to your proxy, even when IP changes.
+1. Go to [AWS Free Tier](https://aws.amazon.com/free/) and sign up.
+2. Launch an EC2 instance with:
+   - **Ubuntu 24.04 LTS**
+   - **t2.micro** (Free Tier)
+3. Configure security group to open ports:
+   - `22` (SSH)
+   - `80` (optional, for HTTP)
+   - `443` (HTTPS/VLESS TLS)
+   - `2004` (3X UI panel)
+4. Download your **.pem key** and store it securely.
 
-🔹 Step 4: Secure with SSL Certificate (Using Certbot)
-🧠 What Happens:
-You install Certbot, which fetches an SSL certificate from Let's Encrypt using your hostname.
+#### 🔍 What Happens:
+You're provisioning a virtual server in the cloud with firewall settings that allow SSH access, TLS connections, and panel access.
 
-You run:
+---
 
-bash
-Copy
-Edit
+### ✅ Step 2: Install Xray-core and 3X UI
+  
+After Creating Instance in AWS you can Connect it on Web 
+
+### ✅ Step 2: Install Xray-core and 3X UI
+
+Switch to root and update:
+
+<pre><code class="language-bash">
+sudo -i
+apt update && apt upgrade -y
+</code></pre>
+
+Install 3X UI and Xray-core:
+
+<pre><code class="language-bash">
+bash &lt;(curl -Ls https://raw.githubusercontent.com/FranzKafkaYu/x-ui/master/install.sh)
+</code></pre>
+
+#### 🔍 What Happens:
+This script installs:
+
+- **Xray-core** (proxy backend)  
+- **3X UI** (GUI for managing VLESS, VMess, Trojan, etc.)  
+- Required systemd services and firewall rules  
+
+---
+
+### ✅ Step 3: Set Up Dynamic DNS with No-IP
+
+1. Go to [No-IP](https://www.noip.com/) and register.
+2. On your EC2 instance you can get your public IPv4 Address
+3. After login in No-IP, go to **DDNS and Remote Access** → No-IP Hostname**.    
+4. Create A Hostname 
+5. Enter a hostname (e.g., `myvlessproxy.ddns.net` or `myproxy.zapto.org`).
+6. in IPv4 Address add your EC2 Public IP Address   
+7. Set hostname type: DNS Host (A). Leave other defaults.
+8. Click **Create Hostname with DDNS Key **
+
+---
+
+### ✅ Step 4: Install SSL Certificates using Certbot
+
+Install Certbot:
+
+<pre><code class="language-bash">
+apt install certbot -y
+</code></pre>
+
+Run Certbot (replace `yourdomain.com` with your actual No-IP hostname):
+
+<pre><code class="language-bash">
 certbot certonly --standalone --agree-tos --register-unsafely-without-email -d yourdomain.com
-Certbot verifies your domain, then generates a public and private key for TLS encryption.
+</code></pre>
 
-✅ Outcome:
-This lets your panel and proxy run on secure HTTPS/TLS (vless + tls) instead of unencrypted HTTP.
+Locate the generated certs:
 
-🔹 Step 5: Configure 3X UI Panel
-🧠 What Happens:
-You run x-ui to launch the 3X UI setup.
+- **Private Key**: `/etc/letsencrypt/live/yourdomain.com/privkey.pem`
+- **Public Key**: `/etc/letsencrypt/live/yourdomain.com/fullchain.pem`
 
-You access it via browser:
+#### 🔍 What Happens:
+Certbot proves ownership of your domain and installs certificates so your proxy server can use HTTPS/TLS encryption for secure connections.
 
-arduino
-Copy
-Edit
-https://yourdomain.com:2004/
-You login using default or reset credentials and paste your SSL cert and key into Panel Settings → Certificates.
+---
 
-Then, you create a new inbound rule for the VLESS proxy on port 443, enable TLS, set SNI, and other parameters.
+### ✅ Step 5: Configure 3X UI Panel and Add Inbound
 
-✅ Outcome:
-You now have a web-based GUI to manage users, generate VLESS links, and monitor traffic stats.
+1. Run `x-ui` in terminal and reset your login if needed.
+2. Open `https://yourdomain.com:2025` in your browser.
+3. Log in → go to **Settings** → paste the certs from Step 4 into the Certificate tab.
+4. Save and restart the panel.
+5. Go to **Inbounds** → click “Add” → create a new VLESS inbound with the following settings:
 
-🔹 Step 6: Connect Using Client App (e.g., NekoRay / Netmod)
-🧠 What Happens:
-You generate VLESS client config via 3X UI or copy the generated link.
+   - **Port**: `443`  
+   - **Protocol**: `vless`  
+   - **Security**: `TLS`  
+   - **Domain**: your No-IP hostname  
+   - **Enable TCP** (optionally with obfuscation)  
+   - Add a Client → auto-generate UUID  
 
-You import the config into a mobile/desktop app like:
+#### 🔍 What Happens:
+This configures the server to listen for encrypted VLESS traffic on port 443, allowing clients to securely connect via TLS.
 
-Netmod (Android)
+---
 
-NekoRay or v2rayNG
+### ✅ Step 6: Connect from VPN Client
 
-You connect using TLS-secured VLESS to your AWS instance.
+Use a client such as **Netmod**, **v2rayNG**, or **NekoRay**.
 
-✅ Outcome:
-You have a working, encrypted, personal proxy service for bypassing censorship, enhancing privacy, or testing secure tunneling.
+#### 🔍 What Happens:
+Your device now tunnels internet traffic securely through your EC2 proxy using encrypted VLESS connections, bypassing local network restrictions.
 
-📦 What This Project Does
-Feature	Description
-✅ Secure Proxy (VLESS + TLS)	Uses the modern VLESS protocol with TLS for secure traffic tunneling.
-✅ Remote GUI Panel (3X UI)	Manage configs, users, and monitor stats from a browser-based dashboard.
-✅ Dynamic DNS Support	No-IP keeps your custom domain synced to changing AWS IPs.
-✅ Certificate-Based Encryption	SSL certificates ensure encrypted HTTPS connections.
+---
 
-⚡ Benefits
-🌐 Bypass network restrictions (e.g., blocked content or countries with firewall)
+## 🌟 Benefits
 
-🔐 Encrypted traffic protects user identity and data.
+- 🔒 **Strong Encryption**: TLS + VLESS provides modern, secure tunneling.
+- 🌍 **Bypass Network Restrictions**: Useful for accessing geo-blocked or censored content.
+- 🧪 **Hands-On Learning**: Gain skills in cloud infrastructure, Linux, SSL, and networking.
+- 🧠 **GUI Panel**: Easily manage users and protocols using the 3X UI dashboard.
+- 🆓 **Free Tier Friendly**: Cost-effective when run within AWS Free Tier limits.
 
-💻 Portable – Works on PC, Android, and other devices.
+---
 
-🧪 Educational – Learn cloud deployment, DNS, SSL, Xray-core config, and proxy protocols.
+## ⚠️ Limitations
 
-⚠️ Limitations
-❌ Not production-ready (self-signed or non-renewing SSL may break)
+- 🧊 **Not Production-Ready**: Meant for personal use and learning only.
+- 🔁 **IP May Change**: EC2 public IPs can change unless you assign a static Elastic IP.
+- 🧱 **Firewall Dependency**: Misconfigured security groups may block access.
+- 📈 **Resource-Constrained**: t2.micro is limited in bandwidth, CPU, and memory.
 
-💰 AWS IP may change unless you use Elastic IPs (not free long-term)
+---
 
-🔓 Misconfigured security groups can expose your server
+## ❗ Disclaimer
 
-📉 Not optimized for heavy load (free-tier EC2 has limited resources)
+> This project is for **educational and personal use only**.
+>
+> ❌ Do **not** use it for illegal activities or content distribution.  
+> ❌ Do **not** deploy it in a production or commercial environment.  
+>
+> The author is not responsible for **any misuse, service interruptions, or legal issues** arising from the use of this project.
 
-🔒 Disclaimer
-This project is for educational and personal learning purposes only.
-Please do not use it for illegal activities, or in commercial or production environments.
-The tools and methods shown are intended to help you understand proxy technology, encryption, and cloud configuration in a secure and responsible way.
+---
 
 
